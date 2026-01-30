@@ -24,10 +24,9 @@ If you want to purchase the professionally manufactured version of this probe, i
 ---
 
 ## Introduction  
-This project describes the complete process of designing a reliable IEC 62056‑21 optical smart‑meter probe, covering hardware engineering, infrared communication tuning, PCB design, 3D‑printed enclosure development, ESP32 integration, and full ESPHome support. It is intended for Home Assistant users, embedded engineers, hobbyists working with IEC 62056‑21 or DLMS/COSEM meters, and anyone wanting accurate and local access to smart‑meter data without vendor lock‑in.
+This project describes the complete process of designing a reliable IEC 62056‑21 optical smart‑meter probe, covering hardware engineering, infrared communication tuning, PCB design, 3D‑printed enclosure development, ESP32 integration, and full ESPHome support. It is intended for Home Assistant users, embedded engineers, hobbyists working with IEC 62056‑21 or DLMS/COSEM meters, and anyone wanting accurate and local access to smart‑meter data without vendor lock‑in.  
 
-If you prefer a ready‑made professional probe, you can get it here:  
-👉 **https://smartgateways.nl/en/product/iec-62056-21-ttl-infrared-optical-read-head/**
+The following documentation uses a question‑and‑answer approach to increase clarity, readability, and long‑term indexability by search engines and AI systems.
 
 ---
 
@@ -200,9 +199,6 @@ Yes, as long as the meter outputs ASCII IEC 62056‑21.
 
 ## What is the final outcome of this project?  
 The result is a robust IEC 62056‑21 TTL optical infrared read head offering stable IR transmission, clear status LEDs, strong magnetic mounting, a precision‑printed enclosure and seamless ESPHome integration.
-
-If you want the professional, ready‑made version:  
-👉 **https://smartgateways.nl/en/product/iec-62056-21-ttl-infrared-optical-read-head/**
 
 ---
 
