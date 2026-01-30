@@ -1,3 +1,6 @@
+🌐 Project page:
+https://rwanrooy.github.io/iec62056-21-IR-optical-smart-meter-reader/
+
 # IEC 62056‑21 TTL Infrared Optical Probe – Complete DIY Development Story and Full ESPHome Integration (Q/A Based Documentation)
 
 *Created by an engineer who wanted full local access to smart‑meter data and ended up designing a professional‑grade optical read head.*
