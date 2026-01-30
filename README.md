@@ -81,7 +81,28 @@ https://smartgateways.nl/en/product/esp32-developer-board-nodemcu-4mb-240mhz-dua
 
 This setup ensures a clean communication path and excellent compatibility with ESPHome.
 
----
+
+## 3D‑Printed Enclosure (Fusion 360 Design, BambuLab X1C Print & Magnetic Mount)
+
+One of the most important steps in the development of this IEC 62056‑21 optical probe was creating a robust, precise and reliable housing. The enclosure was designed from the ground up in **Fusion 360**, allowing complete control over wall thickness, internal component tolerances, magnet seats and cable routing. The 3D model was iterated multiple times until the optical alignment and PCB fit were perfect.
+
+The final enclosure was printed on a **BambuLab X1C**, which provided extremely consistent dimensional accuracy. This is especially important for an optical probe, because even fractions of a millimeter can influence how well the phototransistor aligns with the meter’s optical port.
+
+To guarantee a strong and stable attachment to the smart meter surface, the housing contains recessed slots for **neodymium magnets**. These magnets snap the probe into position and keep it firmly locked in place even when the meter is bumped or the cable is moved.
+
+For flexibility, the design includes an **RJ12 connector** at the back of the housing. This makes it possible to use only the cable length you need, or to create custom RJ12 wiring for integration with ESP32 development boards, test equipment or other IEC 62056‑21 hardware setups.
+
+Below is an image of the 3D‑printed enclosure including the mounted magnets:
+
+![IEC 62056-21 Optical Probe TTL 3D Print Magnets](https://github.com/rwanrooy/iec62056-21-IR-optical-smart-meter-reader/blob/main/images/iec62056-21-optical-probe-ttl-3dprint-magnets.jpeg?raw=true)
+
+<p align="center">
+  <em>
+    IEC 62056‑21 optical probe enclosure: Fusion 360 designed,  
+    BambuLab X1C 3D‑printed housing with integrated neodymium magnets  
+    and rear‑mounted RJ12 connector for flexible cabling.
+  </em>
+</p>
 
 ## How is ESPHome configured to communicate with IEC 62056‑21 meters?  
 Setting up ESPHome requires enabling the external IEC 62056 component, configuring the UART interface, and defining the OBIS codes the meter reports. Meters typically use 7E1 framing, and communication begins at 300 baud before switching to a negotiated rate such as 9600 baud.  
