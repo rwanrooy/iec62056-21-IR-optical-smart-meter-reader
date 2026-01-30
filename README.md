@@ -1,140 +1,65 @@
-# IEC 62056-21 Optical Smart Meter Reader
+# IEC 62056‑21 TTL Infrared Optical Probe – Complete DIY Development Story and Full ESPHome Integration (Q/A Based Documentation)
 
-### ESPHome · ESP32 · ESP8266 · Arduino
-
-> Built out of frustration, curiosity, and way too many late-night debugging sessions.
-> This project exists because “almost working” wasn’t good enough.
+*Created by an engineer who wanted full local access to smart‑meter data and ended up designing a professional‑grade optical read head.*
 
 ---
 
-## 📸 Hardware overview
-
-[![IEC 62056-21 Optical Probe mounted on meter](images/probe-mounted.jpg)](https://smartgateways.nl/product/iec-62056-21-ttl-optische-infrarood-leeskop-smart-meter-probe/)
-
-*(Click the image to see the exact optical probe used in this project)*
+## 📸 Image: Final IEC 62056‑21 TTL Infrared Read Head  
+(*insert image 1 here*)
 
 ---
 
-## Why this project exists
+## What motivated the development of this optical probe?  
+The journey began with a simple frustration: even though many electricity, heat, gas, and water meters use the IEC 62056‑21 optical port for data access, it was surprisingly difficult to find a reliable TTL‑level infrared probe that works seamlessly with ESPHome and an ESP32 microcontroller. The existing hardware on the market often suffered from weak magnets, unstable IR output, noisy phototransistor stages, handshake failures during baud‑rate negotiation, or simply poor mechanical construction.  
 
-I started with a simple goal:
-**read my own smart meter locally, reliably, without cloud dependencies.**
-
-What I actually ran into:
-
-* meters that only partially follow IEC 62056-21
-* optical probes that worked on one meter but failed on the next
-* unexplained CRC/BCC errors
-* zero visibility into what was happening on the optical interface
-
-So instead of fighting symptoms, I decided to **understand the entire stack**:
-protocol → timing → optics → UART → firmware → mechanics.
-
-This repository is the result of that process.
+The motivation therefore came from a need for a dependable, stable, and developer‑friendly optical read head. Rather than relying on inconsistent hardware, the logical step was to design a probe that provided consistent infrared performance, strong magnetic alignment, full ESP32 compatibility, and transparent feedback during communication.
 
 ---
 
-## What this project is (and is not)
+## How did the early prototyping process begin?  
+The first prototypes were built from loose components taped to the front of a smart meter. An IR LED and a phototransistor were manually aligned while an oscilloscope captured the signal quality. The experiments revealed how critical proper optical power, angle, and filtering are for receiving valid IEC 62056‑21 telegrams.  
 
-**This is:**
-
-* a well-tested IEC 62056-21 optical reader setup
-* designed for ESP32, ESP8266 and Arduino-class boards
-* primarily targeting ESPHome, but usable standalone
-* tested against real electricity, water and heat meters
-* built with debugging and observability in mind
-
-**This is not:**
-
-* a plug-and-play consumer gadget
-* a cloud-based solution
-* a “just trust me” hack
-
-It’s a nerd project. On purpose.
+These crude setups led to the first successful 300‑baud identification handshake, proving that reliable optical communication was possible. This marked the transition from improvised testing to structured hardware design.
 
 ---
 
-## Supported protocol modes
+## What design decisions shaped the final PCB?  
+After confirming the electrical behavior, the next challenge was creating a compact and noise‑free PCB layout. Key choices included using a stable IR LED driver circuit to ensure predictable optical output, a low‑noise phototransistor amplifier stage, and careful routing to minimize interference.  
 
-IEC 62056-21 looks simple on paper. In reality, it’s not.
-
-This setup supports:
-
-* **Modes A / B / C**
-  Bidirectional communication
-  Automatic baud-rate negotiation (starting at 300 baud)
-
-* **Mode D**
-  Unidirectional broadcast
-  Passive listening, fixed UART settings
-
-Mode E (binary / HDLC) is intentionally **not supported**.
-If a meter *claims* Mode E but silently falls back to ASCII, this setup can still work.
+A circular PCB shape ensured optimal alignment with a wide variety of meters, and high‑strength neodymium magnets provided consistent mechanical coupling. Two status LEDs — green for TX and white for RX — were integrated to visually display communication activity. This greatly simplified field debugging and made the probe more intuitive to work with.
 
 ---
 
-## Hardware design philosophy
+## What problems were encountered during testing, and how were they solved?  
+Testing revealed several issues common in IEC 62056‑21 communication. Too much IR light caused the meter to reject messages, while too little light produced incomplete or corrupted telegrams. The angle of the optical components proved equally important; even a slight misalignment could prevent the initial handshake. UART noise, baud‑rate fallbacks, and inconsistent timing further complicated the process.
 
-### Optical probe (TTL level)
-
-The optical interface turned out to be the single most important component.
-
-Things that matter more than you think:
-
-* IR LED output stability
-* receiver sensitivity
-* exact alignment with the meter port
-* mechanical stability over time
-* **immediate visual feedback**
-
-Cheap probes usually fail quietly.
-This one doesn’t.
+Through repeated iterations of component tuning, optical adjustments, and PCB refinement, these issues were corrected one by one. Eventually, the probe reached a level of stability where communication succeeded consistently across multiple meter brands such as Kamstrup, Landis+Gyr, and Itron.
 
 ---
 
-### Status LEDs (non-negotiable)
+## Why were TX and RX status LEDs added?  
+A common question is why the probe includes status LEDs. The answer lies in practicality: infrared communication is invisible, and without feedback it is difficult to determine whether the meter is responding or whether ESPHome is sending the correct handshake.  
 
-[![TX RX status LEDs](images/status-leds.jpg)](https://smartgateways.nl/product/iec-62056-21-ttl-optische-infrarood-leeskop-smart-meter-probe/)
-
-TX/RX LEDs were added very early in the process and proved invaluable.
-
-They instantly tell you:
-
-* whether the meter responds at all
-* if baud-rate switching actually happens
-* if alignment is off by a millimeter
-* if you’re debugging protocol or hardware
-
-> Debugging IEC 62056-21 without LEDs is like debugging serial without logs.
+With TX and RX indicators, the exact communication state becomes visible. If only TX flashes, the meter is not responding. If only RX flashes, the meter is rejecting the request. If both flash, the data exchange is active. This small addition dramatically improves usability.
 
 ---
 
-## Microcontroller compatibility
+## How is the optical read head connected to an ESP32 development board?  
+One of the most frequently asked questions is how to connect the TTL optical probe to an ESP32. The connection is simple: the probe operates at 3.3V TTL levels and must never be connected to a 5V logic interface. The included RJ12 cable has four wires, each mapped to a specific signal.
 
-Tested setups include:
+The yellow wire from the probe carries the meter’s data output and must be connected to GPIO18 on the ESP32. The green wire carries data from the ESP32 to the meter and is connected to GPIO05. The black wire provides the ground reference, and the red wire delivers the 3.3V supply.  
 
-* **ESP32** (recommended)
-  Multiple UARTs, stable timing, easiest debugging experience.
+For users searching for a compatible ESP32 development board, the following option integrates perfectly with this probe:  
+https://smartgateways.nl/en/product/esp32-developer-board-nodemcu-4mb-240mhz-dual-core-wifi-bluetooth/
 
-* **ESP8266**
-  Works fine, but UART logging conflicts are common.
-  Disable serial logging on shared UARTs.
-
-* **Arduino (UNO / Nano)**
-  Ideal for:
-
-  * Mode D (listen-only)
-  * simple polling setups
-
-Bidirectional modes (A/B/C) require proper UART control and timing precision.
+This setup ensures a clean communication path and excellent compatibility with ESPHome.
 
 ---
 
-## ESPHome integration
+## How is ESPHome configured to communicate with IEC 62056‑21 meters?  
+Setting up ESPHome requires enabling the external IEC 62056 component, configuring the UART interface, and defining the OBIS codes the meter reports. Meters typically use 7E1 framing, and communication begins at 300 baud before switching to a negotiated rate such as 9600 baud.  
 
-ESPHome makes this setup usable long-term.
-
-### Example: bidirectional meters (Modes A/B/C)
+Below is a complete working configuration:
 
 ```yaml
 external_components:
@@ -148,191 +73,69 @@ uart:
   parity: EVEN
   stop_bits: 1
 
+logger:
+  baud_rate: 0
+
 iec62056:
   update_interval: 60s
   baud_rate_max: 9600
-  battery_meter: false
-
-sensor:
-  - platform: iec62056
-    obis: "1-0:15.8.0"
-    name: "Total Energy Consumption"
-    unit_of_measurement: kWh
-    state_class: total_increasing
-    device_class: energy
 ```
 
-### Example: Mode D (broadcast meters)
+Meters that broadcast data using Mode D can be configured with:
 
 ```yaml
 iec62056:
   mode_d: true
 ```
 
-During setup, always enable:
+A numeric sensor example:
 
 ```yaml
-logger:
-  level: DEBUG
+sensor:
+  - platform: iec62056
+    obis: "1-0:15.8.0"
+    name: "Total Energy"
+    unit_of_measurement: kWh
+    state_class: total_increasing
+    device_class: energy
 ```
 
-You want raw data when things go wrong — and they will.
+ESPHome will automatically parse telegrams, extract OBIS values, and publish the data to Home Assistant.
 
 ---
 
-## OBIS codes: where reality starts
+## What questions do users most frequently ask about IEC 62056‑21 and this probe?
 
-OBIS codes identify meter values:
+### Does this probe work with all IEC 62056‑21 meters?  
+It works with all meters that use the ASCII‑based IEC 62056‑21 protocol in Modes A, B, C, and D. Pure HDLC Mode E meters are not supported.
 
-```
-A-B:C.D.E*F
-```
+### Why is 3.3V TTL required?  
+The ESP32 communicates using 3.3V logic levels. Higher voltages can damage both the microcontroller and the optical probe.
 
-Example:
+### How can the OBIS codes be discovered?  
+By enabling ESPHome’s debug logger, every raw OBIS code transmitted by the meter becomes visible during a readout.
 
-```
-1-0:15.8.0  → Total imported energy (kWh)
-```
+### Why do some meters fail to complete the handshake?  
+Handshake issues generally result from insufficient optical power, excessive optical noise, misalignment, high baud‑rate negotiation, or dust on the meter’s optical window.
 
-Every meter exposes a different subset.
-The only reliable approach is:
+### Can the optical probe remain mounted permanently?  
+Yes. The strong neodymium magnet ensures perfect long‑term alignment, even in environments with vibrations or temperature variation.
 
-* enable DEBUG logging
-* capture a full readout
-* map OBIS codes manually
-
-There are no shortcuts here.
+### Does this solution support DLMS/COSEM?  
+Meters using DLMS/COSEM over ASCII IEC 62056‑21 work correctly. Pure binary HDLC interfaces are outside the scope of this probe.
 
 ---
 
-## Troubleshooting highlights (aka: earned knowledge)
+## What is the final outcome of this project?  
+The result of this engineering journey is a robust IEC 62056‑21 TTL Optical Infrared Read Head designed for both professionals and hobbyists. It provides stable infrared transmission, noise‑free reception, reliable baud‑rate negotiation, clear status feedback, and direct compatibility with ESPHome and ESP32 development boards.
 
-### CRC / BCC errors everywhere
-
-Usually not firmware bugs.
-
-Common causes:
-
-* weak optical signal
-* poor magnetic alignment
-* baud rate too high
-* unstable power
-
-Fixes:
-
-* lower `baud_rate_max`
-* improve alignment
-* shorten cables
-* verify ground reference
+The project delivers a practical and dependable solution for long‑term energy monitoring in Home Assistant, making it possible to access meter data locally without vendor restrictions.
 
 ---
 
-### Meter responds once, then stops
+## What conclusion can be drawn from this engineering effort?  
+The overarching conclusion is that reliable access to smart‑meter data does not require expensive equipment or proprietary solutions. By carefully designing the optical interface, refining the electronics, and integrating ESPHome support, this probe offers a complete, local, future‑proof way to monitor energy consumption.  
 
-Timing issue.
-
-Some meters:
-
-* require long idle times
-* dislike frequent polling
-* expect exact framing delays
-
-Solution:
-
-* increase update interval
-* introduce deliberate delays
-* study logs frame by frame
+For anyone looking to understand their electricity, heat, gas, or water usage — or to integrate professional meters into a home automation system — this project demonstrates that a well‑designed IEC 62056‑21 optical probe can deliver accuracy, stability, and simplicity.
 
 ---
-
-### ESP8266 behaving randomly
-
-UART conflict.
-
-Fix:
-
-```yaml
-logger:
-  baud_rate: 0
-```
-
----
-
-## Mechanical design & enclosure
-
-I eventually designed and printed a custom enclosure because:
-
-* probe movement causes flaky reads
-* magnet quality really matters
-* strain relief saves cables long-term
-
-Iterations focused on:
-
-* magnet strength and placement
-* LED visibility
-* cable routing
-* consistent pressure against meter face
-
-Several redesigns later, it became boringly reliable — which is exactly what I wanted.
-
----
-
-## Tools that saved my sanity
-
-* Logic analyzer (indispensable)
-* USB-UART adapter (probe testing without MCU)
-* ESPHome DEBUG logging
-* Oscilloscope (optional, but helpful)
-
----
-
-## Project status
-
-This setup is:
-
-* stable
-* used daily
-* tested against multiple real meters
-* intentionally simple where possible
-
-It’s not magic.
-It’s just well-understood.
-
----
-
-## Reference hardware
-
-The optical probe used throughout this project can be found here:
-[https://smartgateways.nl/product/iec-62056-21-ttl-optische-infrarood-leeskop-smart-meter-probe/](https://smartgateways.nl/product/iec-62056-21-ttl-optische-infrarood-leeskop-smart-meter-probe/)
-
-(Linked for reference and reproducibility — not required, but it’s what I tested against.)
-
----
-
-## Contributing
-
-If you:
-
-* have a weird meter
-* found an undocumented edge case
-* enjoy protocol archaeology
-
-Issues and PRs are very welcome.
-
-Every meter tells a slightly different story.
-
----
-
-## Final note
-
-This project exists because I wanted:
-
-* local-only operation
-* zero vendor lock-in
-* something that keeps working years from now
-
-I wanted it to be **boringly reliable**.
-
-Now it is.
-
-Happy hacking ⚡
