@@ -5,7 +5,9 @@
 ---
 
 ## 📸 Image: Final IEC 62056‑21 TTL Infrared Read Head  
-(*insert image 1 here*)
+![IEC 62056-21 Optical Probe RJ12 Connector](https://github.com/rwanrooy/iec62056-21-IR-optical-smart-meter-reader/blob/main/images/iec62056-21-optical-probe-ttl-rj-connector.png?raw=true)
+
+<p align="center"><em>IEC 62056‑21 infrared optical smart‑meter probe showing the RJ12 connector wiring used for ESP32 and ESPHome integrations.</em></p>
 
 ---
 
@@ -26,6 +28,12 @@ These crude setups led to the first successful 300‑baud identification handsha
 ## What design decisions shaped the final PCB?  
 After confirming the electrical behavior, the next challenge was creating a compact and noise‑free PCB layout. Key choices included using a stable IR LED driver circuit to ensure predictable optical output, a low‑noise phototransistor amplifier stage, and careful routing to minimize interference.  
 
+![IEC 62056-21 Infrared Optical Probe PCB](https://github.com/rwanrooy/iec62056-21-IR-optical-smart-meter-reader/blob/main/images/iec62056-21-infrared-optical-probe-pcb.png?raw=true)
+
+<p align="center">
+  <em>Internal PCB of the IEC 62056‑21 infrared optical smart‑meter probe, including IR LED driver, phototransistor receiver stage, TTL interface and RJ12 connector for ESP32 and ESPHome.</em>
+</p>
+
 A circular PCB shape ensured optimal alignment with a wide variety of meters, and high‑strength neodymium magnets provided consistent mechanical coupling. Two status LEDs — green for TX and white for RX — were integrated to visually display communication activity. This greatly simplified field debugging and made the probe more intuitive to work with.
 
 ---
@@ -38,7 +46,17 @@ Through repeated iterations of component tuning, optical adjustments, and PCB re
 ---
 
 ## Why were TX and RX status LEDs added?  
-A common question is why the probe includes status LEDs. The answer lies in practicality: infrared communication is invisible, and without feedback it is difficult to determine whether the meter is responding or whether ESPHome is sending the correct handshake.  
+A common question is why the probe includes status LEDs. The answer lies in practicality: infrared communication is invisible, and without feedback it is difficult to determine whether the meter is responding or whether ESPHome is sending the correct handshake.
+
+![IEC 62056-21 Optical Probe Status LEDs](https://github.com/rwanrooy/iec62056-21-IR-optical-smart-meter-reader/blob/main/images/iec62056-21-optical-probe-status-indicator-leds.png?raw=true)
+
+<p align="center">
+  <em>
+    IEC 62056‑21 infrared optical smart‑meter probe showing the dual status indicator LEDs  
+    (green TX and white RX) used to visualize bidirectional IEC 62056‑21 communication  
+    with ESP32, ESPHome and ASCII Mode A/B/C smart meters.
+  </em>
+</p>
 
 With TX and RX indicators, the exact communication state becomes visible. If only TX flashes, the meter is not responding. If only RX flashes, the meter is rejecting the request. If both flash, the data exchange is active. This small addition dramatically improves usability.
 
@@ -47,7 +65,16 @@ With TX and RX indicators, the exact communication state becomes visible. If onl
 ## How is the optical read head connected to an ESP32 development board?  
 One of the most frequently asked questions is how to connect the TTL optical probe to an ESP32. The connection is simple: the probe operates at 3.3V TTL levels and must never be connected to a 5V logic interface. The included RJ12 cable has four wires, each mapped to a specific signal.
 
-The yellow wire from the probe carries the meter’s data output and must be connected to GPIO18 on the ESP32. The green wire carries data from the ESP32 to the meter and is connected to GPIO05. The black wire provides the ground reference, and the red wire delivers the 3.3V supply.  
+![IEC 62056-21 Optical Probe Status LEDs](https://github.com/rwanrooy/iec62056-21-IR-optical-smart-meter-reader/blob/main/images/iec62056-21-optical-probe-ttl-50cm-cable.png?raw=true)
+<p align="center">
+  <em>
+    IEC 62056‑21 infrared optical probe with integrated TTL interface,  
+    50 cm RJ12 cable and strong neodymium magnetic mounting — designed for  
+    ESP32, ESPHome and ASCII Mode A/B/C/D smart‑meter communication.
+  </em>
+</p>
+
+The yellow wire from the probe carries the meter’s data output and must be connected to GPIO18 on the ESP32. The green wire carries data from the ESP32 to the meter and is connected to GPIO05. The black wire provides the ground reference, and the red wire delivers the 3.3V supply.
 
 For users searching for a compatible ESP32 development board, the following option integrates perfectly with this probe:  
 https://smartgateways.nl/en/product/esp32-developer-board-nodemcu-4mb-240mhz-dual-core-wifi-bluetooth/
